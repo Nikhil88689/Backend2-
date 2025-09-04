@@ -2,25 +2,14 @@
     "version": 2,
     "builds": [
         {
-            "src": "api/test.py",
-            "use": "@vercel/python",
-            "config": {
-                "runtime": "python3.9"
-            }
+            "src": "api/index.py",
+            "use": "@vercel/python"
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/api/test.py"
+            "dest": "/api/index.py"
         }
-    ],
-    "env": {
-        "VERCEL": "1"
-    },
-    "functions": {
-        "api/test.py": {
-            "maxDuration": 30
-        }
-    }
+    ]
 }
