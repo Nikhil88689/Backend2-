@@ -13,27 +13,16 @@ if os.getenv("VERCEL"):
     os.makedirs("/tmp", exist_ok=True)
     SQLALCHEMY_DATABASE_URL = "sqlite:////tmp/notes.db"
 else:
-    # Use environment variable for database URL, fallback to local SQLite
-    SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./notes.db")
+    # For local development, use SQLite only (no PostgreSQL support in serverless)
+    SQLALCHEMY_DATABASE_URL = "sqlite:///./notes.db"
 
-# Configure engine based on database type
-if SQLALCHEMY_DATABASE_URL.startswith("postgresql"):
-    # PostgreSQL configuration for production
-    engine = create_engine(
-        SQLALCHEMY_DATABASE_URL,
-        pool_pre_ping=True,
-        pool_recycle=300,
-        connect_args={
-            "sslmode": "require",
-            "connect_timeout": 10
-        }
-    )
-else:
-    # SQLite configuration for local development and Vercel
-    engine = create_engine(
-        SQLALCHEMY_DATABASE_URL, 
-        connect_args={"check_same_thread": False}
-    )
+print(f"Using database URL: {SQLALCHEMY_DATABASE_URL}")
+
+# Configure engine - always use SQLite for serverless
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, 
+    connect_args={"check_same_thread": False}
+)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
