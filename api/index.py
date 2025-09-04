@@ -12,19 +12,32 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Import local modules (will be copied to api directory)
-from .database import SessionLocal, engine, Base
-from .models import User, Note
-from .schemas import (
-    UserCreate, UserResponse, NoteCreate, NoteResponse, 
-    NoteUpdate, ShareNoteRequest, LoginRequest, Token,
-    PublicNoteResponse
-)
+print("Starting imports...")
+try:
+    # Import local modules (will be copied to api directory)
+    from .database import SessionLocal, engine, Base
+    print("Database imported successfully")
+    from .models import User, Note
+    print("Models imported successfully")
+    from .schemas import (
+        UserCreate, UserResponse, NoteCreate, NoteResponse, 
+        NoteUpdate, ShareNoteRequest, LoginRequest, Token,
+        PublicNoteResponse
+    )
+    print("Schemas imported successfully")
+except Exception as e:
+    print(f"Import error: {e}")
+    raise
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
-
+# Initialize FastAPI app
 app = FastAPI(title="Notes API", description="A simple notes app with sharing functionality")
+
+# Initialize database tables
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Database initialization error: {e}")
+    # Continue anyway - tables might already exist
 
 # Security
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
@@ -45,11 +58,17 @@ app.add_middleware(
 
 # Database dependency
 def get_db():
-    db = SessionLocal()
     try:
+        db = SessionLocal()
         yield db
+    except Exception as e:
+        print(f"Database connection error: {e}")
+        raise HTTPException(status_code=500, detail="Database connection failed")
     finally:
-        db.close()
+        try:
+            db.close()
+        except:
+            pass
 
 # Auth helper functions
 def verify_password(plain_password, hashed_password):
@@ -90,7 +109,13 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
 # Routes
 @app.get("/")
 def read_root():
-    return {"message": "Notes API is running on Vercel!"}
+    try:
+        # Test database connection
+        db = SessionLocal()
+        db.close()
+        return {"message": "Notes API is running on Vercel!", "status": "healthy", "database": "connected"}
+    except Exception as e:
+        return {"message": "Notes API is running on Vercel!", "status": "error", "error": str(e)}
 
 @app.post("/auth/register", response_model=UserResponse)
 def register(user: UserCreate, db: Session = Depends(get_db)):

@@ -9,6 +9,8 @@ load_dotenv()
 
 # For Vercel serverless deployment, use SQLite in /tmp directory
 if os.getenv("VERCEL"):
+    # Ensure /tmp directory exists
+    os.makedirs("/tmp", exist_ok=True)
     SQLALCHEMY_DATABASE_URL = "sqlite:////tmp/notes.db"
 else:
     # Use environment variable for database URL, fallback to local SQLite
