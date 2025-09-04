@@ -2,21 +2,21 @@
     "version": 2,
     "builds": [
         {
-            "src": "api/index.py",
+            "src": "api/simple_test.py",
             "use": "@vercel/python"
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/api/index.py"
+            "dest": "/api/simple_test.py"
         }
     ],
     "env": {
         "VERCEL": "1"
     },
     "functions": {
-        "api/index.py": {
+        "api/simple_test.py": {
             "maxDuration": 30
         }
     }
