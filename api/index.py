@@ -12,13 +12,10 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Import from parent directory
-import sys
-sys.path.append('..')
-
-from database import SessionLocal, engine, Base
-from models import User, Note
-from schemas import (
+# Import local modules (will be copied to api directory)
+from .database import SessionLocal, engine, Base
+from .models import User, Note
+from .schemas import (
     UserCreate, UserResponse, NoteCreate, NoteResponse, 
     NoteUpdate, ShareNoteRequest, LoginRequest, Token,
     PublicNoteResponse
@@ -243,6 +240,5 @@ def get_shared_note(note_id: int, db: Session = Depends(get_db)):
         owner_username=owner_username
     )
 
-# Vercel serverless function handler
-def handler(event, context):
-    return app
+# Export app for Vercel
+# This is the entry point for Vercel serverless functions

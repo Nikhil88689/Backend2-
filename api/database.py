@@ -1,14 +1,17 @@
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, Boolean, ForeignKey
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # For Vercel serverless deployment, use SQLite in /tmp directory
 if os.getenv("VERCEL"):
     SQLALCHEMY_DATABASE_URL = "sqlite:////tmp/notes.db"
 else:
-    # Use environment variable for database URL in production
+    # Use environment variable for database URL, fallback to local SQLite
     SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./notes.db")
 
 # Configure engine based on database type
