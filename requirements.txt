@@ -1,1 +1,2 @@
-fastapi>=0.104.0
+# Minimal requirements for basic HTTP handler
+# FastAPI will be added back once basic functionality works
